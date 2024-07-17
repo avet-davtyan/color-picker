@@ -1,7 +1,7 @@
-import { ChangeEvent, Dispatch, SetStateAction, useRef } from 'react';
-import IconColorPicker from '../assets/IconColorPicker.svg';
-import './Header.css';
-import Tools from '../Tools';
+import { ChangeEvent, Dispatch, SetStateAction, useRef, useState } from "react";
+import IconColorPicker from "../assets/IconColorPicker.svg";
+import "./Header.css";
+import Tools from "../Tools";
 
 const Header = ({
     imageFile,
@@ -30,7 +30,7 @@ const Header = ({
     };
 
     const handleColorDropperButtonClick = () => {
-        setSelectedTool(prevState => {
+        setSelectedTool((prevState) => {
             if (prevState !== Tools.ColorDropper && imageFile) {
                 return Tools.ColorDropper;
             }
@@ -38,32 +38,29 @@ const Header = ({
         });
     };
     return (
-        <div className='header'>
+        <div className="header">
             <button
-                className='button'
+                className="button"
                 onClick={handleColorDropperButtonClick}
                 style={{
-                    backgroundColor:
-                        selectedTool === Tools.ColorDropper
-                            ? '#a5a5a5'
-                            : undefined,
+                    backgroundColor: selectedTool === Tools.ColorDropper ? "#a5a5a5" : undefined,
                 }}
             >
                 <img src={IconColorPicker} />
             </button>
-            <p className='color'>{color}</p>
+            <p className="color">{color}</p>
             <>
                 <input
                     ref={inputRef}
-                    type='file'
-                    accept='image/*'
+                    type="file"
+                    accept="image/*"
                     onChange={handleFileChange}
                     multiple={false}
                     style={{
-                        display: 'none',
+                        display: "none",
                     }}
                 />
-                <button onClick={handleInputButtonClick} className='button'>
+                <button onClick={handleInputButtonClick} className="button">
                     Choose an image
                 </button>
             </>

@@ -1,9 +1,8 @@
 .header {
     display: flex;
-    /* gap: 40px; */
     justify-content: space-between;
     width: 100%;
-    padding: 20px 0 20px 0;
+    padding: 25px 0 25px 0;
 }
 
 
@@ -46,4 +45,6 @@
 
   .color {
     font-family: "Inter var",ui-sans-serif,system-ui,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+    font-weight: bold;
+    font-size: 20px;
   }
