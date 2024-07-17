@@ -1,6 +1,5 @@
 import { Dispatch, MouseEventHandler, SetStateAction, useEffect, useState } from "react";
 import { rgbToHex } from "./helpers";
-import ColorDropperCursor from "../assets/ColorDropperCursor.svg";
 import useCanvasRefs from "./CanvasHooks/useCanvasRefs";
 import useCanvasDraw from "./CanvasHooks/useCanvasDraw";
 import "./Canvas.css";
@@ -129,7 +128,7 @@ const Canvas = ({
             ref={canvasBackRef}
             className="canvas-back"
             style={{
-                cursor: colorDropperIsSelected ? `url(${ColorDropperCursor}) 5 5, auto` : "default",
+                cursor: colorDropperIsSelected ? `url(${"ColorDropperCursor.svg"}) 5 5, auto` : "default",
             }}
         >
             <canvas

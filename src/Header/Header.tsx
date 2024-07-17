@@ -1,5 +1,4 @@
-import { ChangeEvent, Dispatch, SetStateAction, useRef, useState } from "react";
-import IconColorPicker from "../assets/IconColorPicker.svg";
+import { ChangeEvent, Dispatch, SetStateAction, useRef } from "react";
 import "./Header.css";
 import Tools from "../Tools";
 
@@ -46,7 +45,7 @@ const Header = ({
                     backgroundColor: selectedTool === Tools.ColorDropper ? "#a5a5a5" : undefined,
                 }}
             >
-                <img src={IconColorPicker} />
+                <img src={"IconColorPicker.svg"} />
             </button>
             <p className="color">{color}</p>
             <>
