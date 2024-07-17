@@ -17,8 +17,13 @@ const Canvas = ({
 }) => {
     const imageCanvasRef = useRef<HTMLCanvasElement>(null);
     const zoomCanvasRef = useRef<HTMLCanvasElement>(null);
+    const canvasBackRef = useRef<HTMLDivElement>(null);
+    const contextRef = useRef<CanvasRenderingContext2D | null>(null);
+    const zoomContextRef = useRef<CanvasRenderingContext2D | null>(null);
+    const [pixelOffset, setPixelOffset] = useState<number | null>(null);
     const [image, setImage] = useState<CanvasImageSource | null>(null);
     const [showZoom, setShowZoom] = useState<boolean>(false);
+
     const [zoomCanvasPosition, setZoomCanvasPosition] = useState<{
         left: number;
         top: number;
@@ -27,13 +32,28 @@ const Canvas = ({
         top: 0,
     });
 
+    useEffect(() => {
+        const canvas = imageCanvasRef.current;
+        if (canvas) {
+            contextRef.current = canvas.getContext('2d');
+        }
+
+        const zoomCanvas = zoomCanvasRef.current;
+        if (zoomCanvas) {
+            zoomContextRef.current = zoomCanvas.getContext('2d', {
+                willReadFrequently: true,
+            });
+        }
+    }, []);
+
+    const colorDropperIsSelected = selectedTool === Tools.ColorDropper;
+
     const drawImage = (file: Blob) => {
         const canvas = imageCanvasRef.current;
         const zoomCanvas = zoomCanvasRef.current;
-        if (!canvas || !zoomCanvas) return;
-        const context = canvas.getContext('2d');
-        const zoomContext = zoomCanvas.getContext('2d');
-        if (!context || !zoomContext) return;
+        const context = contextRef.current;
+        const zoomContext = zoomContextRef.current;
+        if (!canvas || !zoomCanvas || !context || !zoomContext) return;
 
         const reader = new FileReader();
 
@@ -42,8 +62,11 @@ const Canvas = ({
             img.onload = () => {
                 canvas.width = img.width;
                 canvas.height = img.height;
-                zoomCanvas.width = 41;
-                zoomCanvas.height = 41;
+                const offset = Math.round(Math.max(img.width, img.height) / 60);
+                setPixelOffset(offset);
+                zoomCanvas.width = offset * 2 + 1;
+                zoomCanvas.height = offset * 2 + 1;
+
                 setImage(img);
 
                 context.drawImage(img, 0, 0);
@@ -57,64 +80,49 @@ const Canvas = ({
     };
 
     const zoom = (x: number, y: number) => {
-        const canvas: HTMLCanvasElement | null = imageCanvasRef.current;
-        if (!canvas) return;
-        const context: CanvasRenderingContext2D | null =
-            canvas.getContext('2d');
-        if (!context || !image) return;
-
-        const zoomCanvas: HTMLCanvasElement | null = zoomCanvasRef.current;
-        if (!zoomCanvas) return;
-        const zoomContext: CanvasRenderingContext2D | null =
-            zoomCanvas.getContext('2d');
-        if (!zoomContext) return;
-
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        context.drawImage(image, 0, 0);
-        context.save();
-        context.beginPath();
-        context.arc(x, y, 200, 0, Math.PI * 2);
+        const canvas = imageCanvasRef.current;
+        const zoomCanvas = zoomCanvasRef.current;
+        const zoomContext = zoomContextRef.current;
+        if (!canvas || !zoomContext || !zoomCanvas || !image || !pixelOffset)
+            return;
 
         zoomContext.clearRect(0, 0, zoomCanvas.width, zoomCanvas.height);
 
         zoomContext.drawImage(
             image,
-            x - 20,
-            y - 20,
-            40,
-            40,
+            x - pixelOffset,
+            y - pixelOffset,
+            pixelOffset * 2 + 1,
+            pixelOffset * 2 + 1,
             0,
             0,
             zoomCanvas.width,
             zoomCanvas.height,
         );
-        zoomContext.restore();
 
-        context.restore();
+        zoomContext.restore();
     };
 
     const handleCanvasMouseMove = (event: any) => {
-        const canvas: HTMLCanvasElement | null = imageCanvasRef.current;
-        if (!canvas) return;
-        const context: CanvasRenderingContext2D | null =
-            canvas.getContext('2d');
-        if (!context || !image) return;
-
-        const zoomCanvas: HTMLCanvasElement | null = zoomCanvasRef.current;
-        if (!zoomCanvas) return;
-        const zoomContext: CanvasRenderingContext2D | null =
-            zoomCanvas.getContext('2d', { willReadFrequently: true });
-        if (!zoomContext) return;
+        const canvas = imageCanvasRef.current;
+        const context = contextRef.current;
+        const zoomContext = zoomContextRef.current;
+        if (!canvas || !context || !zoomContext || !image || !pixelOffset)
+            return;
 
         const rect = canvas.getBoundingClientRect();
-
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
 
         const x = (event.clientX - rect.left) * scaleX;
         const y = (event.clientY - rect.top) * scaleY;
 
-        const imageData = zoomContext.getImageData(21, 21, 1, 1).data;
+        const imageData = zoomContext.getImageData(
+            pixelOffset + 1,
+            pixelOffset + 1,
+            1,
+            1,
+        ).data;
         const [r, g, b] = imageData;
 
         setColor(rgbToHex(r, g, b));
@@ -126,7 +134,8 @@ const Canvas = ({
         zoom(x, y);
     };
 
-    const handleCanvasMouseEnter = () => {
+    const handleCanvasMouseEnter = (event: any) => {
+        handleCanvasMouseMove(event);
         setShowZoom(true);
     };
 
@@ -136,12 +145,15 @@ const Canvas = ({
 
     useEffect(() => {
         if (imageFile) {
+            console.log('change');
+            setShowZoom(false);
             drawImage(imageFile);
         }
     }, [imageFile]);
 
     return (
         <div
+            ref={canvasBackRef}
             className='canvas-back'
             style={{
                 cursor:
@@ -149,17 +161,31 @@ const Canvas = ({
                         ? `url(${ColorDropperCursor}) 5 5, auto`
                         : 'default',
             }}
-            onMouseEnter={handleCanvasMouseEnter}
         >
             <canvas
                 ref={imageCanvasRef}
-                onMouseMove={handleCanvasMouseMove}
-                onMouseLeave={handleCavnasMouseLeave}
                 className='image-canvas'
+                onMouseMove={
+                    colorDropperIsSelected && showZoom
+                        ? handleCanvasMouseMove
+                        : undefined
+                }
+                onMouseLeave={handleCavnasMouseLeave}
+                onMouseEnter={
+                    colorDropperIsSelected ? handleCanvasMouseEnter : undefined
+                }
             />
 
             {
-                <div>
+                <div
+                    style={{
+                        opacity:
+                            showZoom && colorDropperIsSelected && imageFile
+                                ? '100%'
+                                : '0%',
+                        transition: '0.3s all',
+                    }}
+                >
                     <div
                         className='zoom-canvas-back'
                         style={{

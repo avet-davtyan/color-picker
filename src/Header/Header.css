@@ -9,6 +9,7 @@
 
 .button {
     background-color: #FFFFFF;
+    transition: 0.1s all;
     border: 1px solid rgb(209,213,219);
     border-radius: .5rem;
     box-sizing: border-box;

@@ -6,10 +6,12 @@ import Tools from '../Tools';
 const Header = ({
     setImageFile,
     color,
+    selectedTool,
     setSelectedTool,
 }: {
     setImageFile: Dispatch<SetStateAction<Blob | null>>;
     color: string | null;
+    selectedTool: Tools;
     setSelectedTool: Dispatch<SetStateAction<Tools>>;
 }) => {
     const inputRef = useRef<HTMLInputElement>(null);
@@ -18,6 +20,7 @@ const Header = ({
         const files: FileList | null = event.target.files;
         if (!files) return;
         setImageFile(files[0]);
+        setSelectedTool(Tools.None);
     };
 
     const handleInputButtonClick = () => {
@@ -34,7 +37,16 @@ const Header = ({
     };
     return (
         <div className='header'>
-            <button className='button' onClick={handleColorDropperButtonClick}>
+            <button
+                className='button'
+                onClick={handleColorDropperButtonClick}
+                style={{
+                    backgroundColor:
+                        selectedTool === Tools.ColorDropper
+                            ? '#a5a5a5'
+                            : undefined,
+                }}
+            >
                 <img src={IconColorPicker} />
             </button>
             <p className='color'>{color}</p>
