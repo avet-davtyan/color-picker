@@ -1,0 +1,47 @@
+.image-canvas {
+    height: 850px;
+}
+
+.canvas-back {
+    position: relative;
+    overflow: hidden;
+}
+
+.zoom-canvas-back {
+    position: absolute;
+    height: 100px;
+    width: 100px;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    border-radius: 100%;
+    overflow: hidden;
+    border: 5px solid black; 
+}
+
+.zoom-canvas {
+    height: 150px;
+    width: 150px;
+    pointer-events: none;
+    position: absolute
+}
+
+
+.color-text-back {
+    position: absolute;
+    left: 50%;
+    top: 80%;
+    transform: translate(-50%,-50%);
+    background-color: rgb(85, 85, 85);
+    padding: 4px;
+    box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+    border-radius: 4px;
+
+}
+
+.color-text {
+    padding: 0;
+    font-family: "Inter var",ui-sans-serif,system-ui,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+    margin: 0;
+    font-size: small;
+    color: rgb(209, 209, 209);
+}
