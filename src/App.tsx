@@ -20,18 +20,21 @@ function App() {
                         : 'default',
             }}
         >
-            <Header
-                setImageFile={setImageFile}
-                color={color}
-                selectedTool={selectedTool}
-                setSelectedTool={setSelectedTool}
-            />
-            <Canvas
-                imageFile={imageFile}
-                color={color}
-                setColor={setColor}
-                selectedTool={selectedTool}
-            />
+            <div>
+                <Header
+                    imageFile={imageFile}
+                    setImageFile={setImageFile}
+                    color={color}
+                    selectedTool={selectedTool}
+                    setSelectedTool={setSelectedTool}
+                />
+                <Canvas
+                    imageFile={imageFile}
+                    color={color}
+                    setColor={setColor}
+                    selectedTool={selectedTool}
+                />
+            </div>
         </div>
     );
 }

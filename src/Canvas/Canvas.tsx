@@ -21,6 +21,8 @@ const Canvas = ({
     const contextRef = useRef<CanvasRenderingContext2D | null>(null);
     const zoomContextRef = useRef<CanvasRenderingContext2D | null>(null);
     const [pixelOffset, setPixelOffset] = useState<number | null>(null);
+    const zoomLength = pixelOffset && pixelOffset * 2 + 1;
+    const zoomCenter = pixelOffset && pixelOffset + 1;
     const [image, setImage] = useState<CanvasImageSource | null>(null);
     const [showZoom, setShowZoom] = useState<boolean>(false);
 
@@ -83,7 +85,14 @@ const Canvas = ({
         const canvas = imageCanvasRef.current;
         const zoomCanvas = zoomCanvasRef.current;
         const zoomContext = zoomContextRef.current;
-        if (!canvas || !zoomContext || !zoomCanvas || !image || !pixelOffset)
+        if (
+            !canvas ||
+            !zoomContext ||
+            !zoomCanvas ||
+            !image ||
+            !pixelOffset ||
+            !zoomLength
+        )
             return;
 
         zoomContext.clearRect(0, 0, zoomCanvas.width, zoomCanvas.height);
@@ -92,8 +101,8 @@ const Canvas = ({
             image,
             x - pixelOffset,
             y - pixelOffset,
-            pixelOffset * 2 + 1,
-            pixelOffset * 2 + 1,
+            zoomLength,
+            zoomLength,
             0,
             0,
             zoomCanvas.width,
@@ -107,7 +116,14 @@ const Canvas = ({
         const canvas = imageCanvasRef.current;
         const context = contextRef.current;
         const zoomContext = zoomContextRef.current;
-        if (!canvas || !context || !zoomContext || !image || !pixelOffset)
+        if (
+            !canvas ||
+            !context ||
+            !zoomContext ||
+            !image ||
+            !pixelOffset ||
+            !zoomCenter
+        )
             return;
 
         const rect = canvas.getBoundingClientRect();
@@ -118,8 +134,8 @@ const Canvas = ({
         const y = (event.clientY - rect.top) * scaleY;
 
         const imageData = zoomContext.getImageData(
-            pixelOffset + 1,
-            pixelOffset + 1,
+            zoomCenter,
+            zoomCenter,
             1,
             1,
         ).data;

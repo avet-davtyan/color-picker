@@ -1,7 +1,9 @@
 .header {
     display: flex;
-    gap: 40px;
-    padding: 20px;
+    /* gap: 40px; */
+    justify-content: space-between;
+    width: 100%;
+    padding: 20px 0 20px 0;
 }
 
 

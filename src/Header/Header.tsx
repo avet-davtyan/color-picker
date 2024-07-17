@@ -4,11 +4,13 @@ import './Header.css';
 import Tools from '../Tools';
 
 const Header = ({
+    imageFile,
     setImageFile,
     color,
     selectedTool,
     setSelectedTool,
 }: {
+    imageFile: Blob | null;
     setImageFile: Dispatch<SetStateAction<Blob | null>>;
     color: string | null;
     selectedTool: Tools;
@@ -29,7 +31,7 @@ const Header = ({
 
     const handleColorDropperButtonClick = () => {
         setSelectedTool(prevState => {
-            if (prevState !== Tools.ColorDropper) {
+            if (prevState !== Tools.ColorDropper && imageFile) {
                 return Tools.ColorDropper;
             }
             return Tools.None;
