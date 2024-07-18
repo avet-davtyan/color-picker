@@ -23,8 +23,8 @@ interface DrawZoomProps {
 const useCanvasDraw = () => {
     const zoomScale = 60;
     const canvasMaxWidthVW = 70;
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.outerWidth;
+    const viewportHeight = window.outerHeight;
     const canvasMaxHeight = (viewportHeight * canvasMaxWidthVW) / 100 + 'px';
     const canvasMaxWidth = (viewportWidth * canvasMaxWidthVW) / 100 + 'px';
     const drawImageCanvas = ({
