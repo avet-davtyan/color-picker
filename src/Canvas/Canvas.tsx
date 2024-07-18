@@ -1,6 +1,8 @@
 import {
     Dispatch,
     MouseEventHandler,
+    MouseEvent,
+    TouchEvent,
     SetStateAction,
     useEffect,
     useState,
@@ -10,6 +12,10 @@ import useCanvasRefs from './CanvasHooks/useCanvasRefs';
 import useCanvasDraw from './CanvasHooks/useCanvasDraw';
 import './Canvas.css';
 import Tools from '../Tools';
+
+type CanvasEvent =
+    | MouseEvent<HTMLCanvasElement>
+    | TouchEvent<HTMLCanvasElement>;
 
 const Canvas = ({
     imageFile,
@@ -42,6 +48,7 @@ const Canvas = ({
         left: 0,
         top: 0,
     });
+
     const colorDropperIsSelected = selectedTool === Tools.ColorDropper;
 
     useEffect(() => {
@@ -58,7 +65,7 @@ const Canvas = ({
         }
     }, []);
 
-    const handleCanvasMouseMove: MouseEventHandler<HTMLDivElement> = event => {
+    const handleCanvasMove = (event: CanvasEvent) => {
         const canvas = imageCanvasRef.current;
         const zoomCanvas = zoomCanvasRef.current;
         const context = imageContextRef.current;
@@ -81,8 +88,16 @@ const Canvas = ({
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
 
-        const x = (event.clientX - rect.left) * scaleX;
-        const y = (event.clientY - rect.top) * scaleY;
+        let x: number, y: number;
+
+        if ('touches' in event) {
+            const touch = event.touches[0];
+            x = (touch.clientX - rect.left) * scaleX;
+            y = (touch.clientY - rect.top) * scaleY;
+        } else {
+            x = (event.clientX - rect.left) * scaleX;
+            y = (event.clientY - rect.top) * scaleY;
+        }
 
         const imageData = zoomContext.getImageData(
             zoomCenter,
@@ -123,18 +138,18 @@ const Canvas = ({
         });
     };
 
-    const handleCanvasMouseEnter: MouseEventHandler<HTMLDivElement> = event => {
-        handleCanvasMouseMove(event);
+    const handleCanvasEnter = (event: CanvasEvent) => {
+        handleCanvasMove(event);
         setShowZoom(true);
     };
 
-    const handleCanvasClick = () => {
+    const handleCanvasClick = (event: CanvasEvent) => {
         if (colorDropperIsSelected && showZoom) {
             setSelectedColor(color);
         }
     };
 
-    const handleCavnasMouseLeave = () => {
+    const handleCanvasLeave = (event: CanvasEvent) => {
         setShowZoom(false);
     };
 
@@ -163,18 +178,26 @@ const Canvas = ({
                     ? `url(${'ColorDropperCursor.svg'}) 5 5, auto`
                     : 'default',
             }}
-            onMouseEnter={
-                colorDropperIsSelected ? handleCanvasMouseEnter : undefined
-            }
-            onMouseLeave={handleCavnasMouseLeave}
-            onMouseMove={
-                colorDropperIsSelected && showZoom
-                    ? handleCanvasMouseMove
-                    : undefined
-            }
-            onClick={handleCanvasClick}
         >
-            <canvas ref={imageCanvasRef} className='image-canvas' />
+            <canvas
+                ref={imageCanvasRef}
+                className='image-canvas'
+                onMouseEnter={
+                    colorDropperIsSelected ? handleCanvasEnter : undefined
+                }
+                onMouseLeave={handleCanvasLeave}
+                onMouseMove={
+                    colorDropperIsSelected && showZoom
+                        ? handleCanvasMove
+                        : undefined
+                }
+                onTouchMove={
+                    colorDropperIsSelected && showZoom
+                        ? handleCanvasMove
+                        : undefined
+                }
+                onClick={handleCanvasClick}
+            />
 
             {
                 <div
