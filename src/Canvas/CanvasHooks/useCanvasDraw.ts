@@ -1,4 +1,4 @@
-import { Dispatch, RefObject, SetStateAction } from "react";
+import { Dispatch, RefObject, SetStateAction } from 'react';
 
 interface drawImageProps {
     imageFile: Blob;
@@ -21,6 +21,9 @@ interface DrawZoomProps {
 }
 
 const useCanvasDraw = () => {
+    const zoomScale = 60;
+    const canvasMaxHeight = '80vh';
+    const canvasMaxWidth = '120vh';
     const drawImageOnCanvas = ({
         imageFile,
         imageCanvasRef,
@@ -39,25 +42,26 @@ const useCanvasDraw = () => {
 
         const reader = new FileReader();
 
-        reader.onload = (event) => {
+        reader.onload = event => {
             const img = new Image();
             img.onload = () => {
                 canvas.width = img.width;
                 canvas.height = img.height;
-                const offset = Math.round(Math.max(img.width, img.height) / 60);
+                const offset = Math.round(
+                    Math.max(img.width, img.height) / zoomScale,
+                );
 
                 if (img.width / img.height < 2) {
-                    canvasBackRef.current!.style.width = "";
-                    imageCanvasRef.current!.style.width = "";
-                    canvasBackRef.current!.style.height = "850px";
-                    imageCanvasRef.current!.style.height = "100%";
+                    canvasBackRef.current!.style.width = '';
+                    imageCanvasRef.current!.style.width = '';
+                    canvasBackRef.current!.style.height = canvasMaxHeight;
+                    imageCanvasRef.current!.style.height = '100%';
                 } else {
-                    canvasBackRef.current!.style.height = "";
-                    imageCanvasRef.current!.style.height = "";
-                    canvasBackRef.current!.style.width = "1200px";
-                    imageCanvasRef.current!.style.width = "100%";
+                    canvasBackRef.current!.style.height = '';
+                    imageCanvasRef.current!.style.height = '';
+                    canvasBackRef.current!.style.width = canvasMaxWidth;
+                    imageCanvasRef.current!.style.width = '100%';
                 }
-                canvasBackRef.current!.style.height = "850px";
                 setPixelOffset(offset);
                 zoomCanvas.width = offset * 2 + 1;
                 zoomCanvas.height = offset * 2 + 1;
@@ -74,7 +78,14 @@ const useCanvasDraw = () => {
         reader.readAsDataURL(imageFile);
     };
 
-    const drawZoomCanvas = ({ x, y, zoomCanvasRef, zoomContextRef, image, pixelOffset }: DrawZoomProps) => {
+    const drawZoomCanvas = ({
+        x,
+        y,
+        zoomCanvasRef,
+        zoomContextRef,
+        image,
+        pixelOffset,
+    }: DrawZoomProps) => {
         const zoomCanvas = zoomCanvasRef.current as HTMLCanvasElement;
         const zoomContext = zoomContextRef.current as CanvasRenderingContext2D;
 
@@ -90,7 +101,7 @@ const useCanvasDraw = () => {
             0,
             0,
             zoomCanvas.width,
-            zoomCanvas.height
+            zoomCanvas.height,
         );
 
         zoomContext.restore();

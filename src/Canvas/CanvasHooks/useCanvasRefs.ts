@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef } from 'react';
 
 const useCanvasRefs = () => {
     const imageCanvasRef = useRef<HTMLCanvasElement>(null);

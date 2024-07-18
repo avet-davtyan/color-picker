@@ -1,8 +1,8 @@
-import Header from "./Header";
-import { useState } from "react";
-import Canvas from "./Canvas";
-import "./App.css";
-import Tools from "./Tools";
+import Header from './Header';
+import { useState } from 'react';
+import Canvas from './Canvas';
+import './App.css';
+import Tools from './Tools';
 function App() {
     const [imageFile, setImageFile] = useState<Blob | null>(null);
     const [color, setColor] = useState<string | null>(null);
@@ -11,9 +11,12 @@ function App() {
 
     return (
         <div
-            className="main-back"
+            className='main-back'
             style={{
-                cursor: selectedTool === Tools.ColorDropper ? `url(${"IconColorPicker.svg"}) 0 16, auto` : "default",
+                cursor:
+                    selectedTool === Tools.ColorDropper
+                        ? `url(${'IconColorPicker.svg'}) 0 16, auto`
+                        : 'default',
             }}
         >
             <div>
