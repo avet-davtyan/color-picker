@@ -34,7 +34,7 @@ const Canvas = ({
         imageContextRef,
         zoomContextRef,
     } = useCanvasRefs();
-    const { drawImageOnCanvas, drawZoomCanvas } = useCanvasDraw();
+    const { drawImageCanvas, drawZoomCanvas } = useCanvasDraw();
     const [zoomCanvasPosition, setZoomCanvasPosition] = useState<{
         left: number;
         top: number;
@@ -58,20 +58,19 @@ const Canvas = ({
         }
     }, []);
 
-    const handleCanvasMouseMove: MouseEventHandler<
-        HTMLCanvasElement
-    > = event => {
+    const handleCanvasMouseMove: MouseEventHandler<HTMLDivElement> = event => {
         const canvas = imageCanvasRef.current;
         const zoomCanvas = zoomCanvasRef.current;
         const context = imageContextRef.current;
         const zoomContext = zoomContextRef.current;
+
         if (
             !canvas ||
             !zoomCanvas ||
             !context ||
             !zoomContext ||
             !image ||
-            !pixelOffset
+            pixelOffset === null
         )
             return;
 
@@ -124,9 +123,7 @@ const Canvas = ({
         });
     };
 
-    const handleCanvasMouseEnter: MouseEventHandler<
-        HTMLCanvasElement
-    > = event => {
+    const handleCanvasMouseEnter: MouseEventHandler<HTMLDivElement> = event => {
         handleCanvasMouseMove(event);
         setShowZoom(true);
     };
@@ -144,7 +141,7 @@ const Canvas = ({
     useEffect(() => {
         if (imageFile) {
             setShowZoom(false);
-            drawImageOnCanvas({
+            drawImageCanvas({
                 imageFile,
                 imageCanvasRef,
                 zoomCanvasRef,
@@ -166,21 +163,18 @@ const Canvas = ({
                     ? `url(${'ColorDropperCursor.svg'}) 5 5, auto`
                     : 'default',
             }}
+            onMouseEnter={
+                colorDropperIsSelected ? handleCanvasMouseEnter : undefined
+            }
+            onMouseLeave={handleCavnasMouseLeave}
+            onMouseMove={
+                colorDropperIsSelected && showZoom
+                    ? handleCanvasMouseMove
+                    : undefined
+            }
+            onClick={handleCanvasClick}
         >
-            <canvas
-                ref={imageCanvasRef}
-                className='image-canvas'
-                onMouseEnter={
-                    colorDropperIsSelected ? handleCanvasMouseEnter : undefined
-                }
-                onMouseLeave={handleCavnasMouseLeave}
-                onMouseMove={
-                    colorDropperIsSelected && showZoom
-                        ? handleCanvasMouseMove
-                        : undefined
-                }
-                onClick={handleCanvasClick}
-            />
+            <canvas ref={imageCanvasRef} className='image-canvas' />
 
             {
                 <div

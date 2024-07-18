@@ -1,6 +1,6 @@
 import { Dispatch, RefObject, SetStateAction } from 'react';
 
-interface drawImageProps {
+interface DrawImageProps {
     imageFile: Blob;
     imageCanvasRef: RefObject<HTMLCanvasElement>;
     zoomCanvasRef: RefObject<HTMLCanvasElement>;
@@ -22,9 +22,12 @@ interface DrawZoomProps {
 
 const useCanvasDraw = () => {
     const zoomScale = 60;
-    const canvasMaxHeight = '80vh';
-    const canvasMaxWidth = '120vh';
-    const drawImageOnCanvas = ({
+    const canvasMaxWidthVW = 70;
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const canvasMaxHeight = (viewportHeight * canvasMaxWidthVW) / 100 + 'px';
+    const canvasMaxWidth = (viewportWidth * canvasMaxWidthVW) / 100 + 'px';
+    const drawImageCanvas = ({
         imageFile,
         imageCanvasRef,
         zoomCanvasRef,
@@ -33,7 +36,7 @@ const useCanvasDraw = () => {
         canvasBackRef,
         setPixelOffset,
         setImage,
-    }: drawImageProps) => {
+    }: DrawImageProps) => {
         const canvas = imageCanvasRef.current;
         const zoomCanvas = zoomCanvasRef.current;
         const context = imageContextRef.current;
@@ -47,11 +50,12 @@ const useCanvasDraw = () => {
             img.onload = () => {
                 canvas.width = img.width;
                 canvas.height = img.height;
-                const offset = Math.round(
+                let offset = Math.round(
                     Math.max(img.width, img.height) / zoomScale,
                 );
+                offset = Math.max(offset, 2);
 
-                if (img.width / img.height < 2) {
+                if (img.width / img.height < 1.6) {
                     canvasBackRef.current!.style.width = '';
                     imageCanvasRef.current!.style.width = '';
                     canvasBackRef.current!.style.height = canvasMaxHeight;
@@ -107,7 +111,7 @@ const useCanvasDraw = () => {
         zoomContext.restore();
     };
 
-    return { drawImageOnCanvas, drawZoomCanvas };
+    return { drawImageCanvas, drawZoomCanvas };
 };
 
 export default useCanvasDraw;

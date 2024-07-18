@@ -2,42 +2,42 @@ import { ChangeEvent, Dispatch, SetStateAction, useRef } from 'react';
 import './Header.css';
 import Tools from '../Tools';
 
+interface HeaderProps {
+    imageFile: Blob | null;
+    setImageFile: Dispatch<SetStateAction<Blob | null>>;
+    color: string | null;
+    selectedTool: Tools;
+    setSelectedTool: Dispatch<SetStateAction<Tools>>;
+}
+
 const Header = ({
     imageFile,
     setImageFile,
     color,
     selectedTool,
     setSelectedTool,
-}: {
-    imageFile: Blob | null;
-    setImageFile: Dispatch<SetStateAction<Blob | null>>;
-    color: string | null;
-    selectedTool: Tools;
-    setSelectedTool: Dispatch<SetStateAction<Tools>>;
-}) => {
+}: HeaderProps) => {
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const files: FileList | null = event.target.files;
-        if (!files || files?.length == 0) return;
-        console.log(files);
+    const handleFileChange = (event: ChangeEvent<HTMLInputElement>): void => {
+        const files = event.target.files;
+        if (!files || files.length === 0) return;
         setImageFile(files[0]);
         setSelectedTool(Tools.None);
     };
 
-    const handleInputButtonClick = () => {
+    const handleInputButtonClick = (): void => {
         inputRef.current?.click();
     };
 
-    const handleColorDropperButtonClick = () => {
+    const handleColorDropperButtonClick = (): void => {
         if (!imageFile) return;
-        setSelectedTool(prevState => {
-            if (prevState !== Tools.ColorDropper) {
-                return Tools.ColorDropper;
-            }
-            return Tools.None;
-        });
+
+        setSelectedTool(prevState =>
+            prevState === Tools.ColorDropper ? Tools.None : Tools.ColorDropper,
+        );
     };
+
     return (
         <div className='header'>
             <button
@@ -51,19 +51,17 @@ const Header = ({
                             : undefined,
                 }}
             >
-                <img src={'IconColorPicker.svg'} />
+                <img src={'IconColorPicker.svg'} alt='Color Picker' />
             </button>
             <p className='color'>{color}</p>
-            <>
+            <div>
                 <input
                     ref={inputRef}
                     type='file'
                     accept='image/*'
                     onChange={handleFileChange}
                     multiple={false}
-                    style={{
-                        display: 'none',
-                    }}
+                    style={{ display: 'none' }}
                 />
                 <button
                     onClick={handleInputButtonClick}
@@ -71,7 +69,7 @@ const Header = ({
                 >
                     Choose an image
                 </button>
-            </>
+            </div>
         </div>
     );
 };
