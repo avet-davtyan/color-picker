@@ -1,39 +1,18 @@
-import Header from './Header';
-import { useState } from 'react';
-import Canvas from './Canvas';
-import './App.css';
-import Tools from './Tools';
+import Header from "./Header";
+import { useState } from "react";
+import Canvas from "./Canvas";
+import "./App.css";
+import Tools from "./Tools";
+import { useToolContext } from "./context/ToolContext";
 function App() {
-    const [imageFile, setImageFile] = useState<Blob | null>(null);
-    const [color, setColor] = useState<string | null>(null);
-    const [selectedColor, setSelectedColor] = useState<string | null>(null);
-    const [selectedTool, setSelectedTool] = useState<Tools>(Tools.None);
+    const { selectedTool } = useToolContext();
+    const dropperIsSelected = () => selectedTool === Tools.ColorDropper && "picker";
 
     return (
-        <div
-            className='main-back'
-            style={{
-                cursor:
-                    selectedTool === Tools.ColorDropper
-                        ? `url(${'IconColorPicker.svg'}) 0 16, auto`
-                        : 'default',
-            }}
-        >
+        <div className={`main-back ${dropperIsSelected()}`}>
             <div>
-                <Header
-                    imageFile={imageFile}
-                    setImageFile={setImageFile}
-                    color={selectedColor}
-                    selectedTool={selectedTool}
-                    setSelectedTool={setSelectedTool}
-                />
-                <Canvas
-                    imageFile={imageFile}
-                    color={color}
-                    setColor={setColor}
-                    setSelectedColor={setSelectedColor}
-                    selectedTool={selectedTool}
-                />
+                <Header />
+                <Canvas />
             </div>
         </div>
     );

@@ -1,45 +1,25 @@
-import {
-    Dispatch,
-    MouseEventHandler,
-    MouseEvent,
-    TouchEvent,
-    SetStateAction,
-    useEffect,
-    useState,
-} from 'react';
-import { rgbToHex } from './helpers';
-import useCanvasRefs from './CanvasHooks/useCanvasRefs';
-import useCanvasDraw from './CanvasHooks/useCanvasDraw';
-import './Canvas.css';
-import Tools from '../Tools';
+import { MouseEvent, TouchEvent, useEffect, useState } from "react";
+import { rgbToHex } from "./helpers";
+import useCanvasRefs from "./CanvasHooks/useCanvasRefs";
+import useCanvasDraw from "./CanvasHooks/useCanvasDraw";
+import { useImageContext } from "../context/ImageContext";
+import { useToolContext } from "../context/ToolContext";
+import { useColorContext } from "../context/ColorContext";
+import Tools from "../Tools";
+import "./Canvas.css";
 
-type CanvasEvent =
-    | MouseEvent<HTMLCanvasElement>
-    | TouchEvent<HTMLCanvasElement>;
+type CanvasEvent = MouseEvent<HTMLCanvasElement> | TouchEvent<HTMLCanvasElement>;
 
-const Canvas = ({
-    imageFile,
-    color,
-    setColor,
-    setSelectedColor,
-    selectedTool,
-}: {
-    imageFile: Blob | null;
-    color: string | null;
-    setColor: Dispatch<SetStateAction<string | null>>;
-    setSelectedColor: Dispatch<SetStateAction<string | null>>;
-    selectedTool: Tools;
-}) => {
+const Canvas: React.FC = () => {
+    const { imageFile } = useImageContext();
+    const { selectedTool } = useToolContext();
+    const { setSelectedColor } = useColorContext();
+
     const [pixelOffset, setPixelOffset] = useState<number | null>(null);
+    const [color, setColor] = useState<string | null>(null);
     const [image, setImage] = useState<CanvasImageSource | null>(null);
     const [showZoom, setShowZoom] = useState<boolean>(false);
-    const {
-        imageCanvasRef,
-        zoomCanvasRef,
-        canvasBackRef,
-        imageContextRef,
-        zoomContextRef,
-    } = useCanvasRefs();
+    const { imageCanvasRef, zoomCanvasRef, canvasBackRef, imageContextRef, zoomContextRef } = useCanvasRefs();
     const { drawImageCanvas, drawZoomCanvas } = useCanvasDraw();
     const [zoomCanvasPosition, setZoomCanvasPosition] = useState<{
         left: number;
@@ -54,12 +34,12 @@ const Canvas = ({
     useEffect(() => {
         const canvas = imageCanvasRef.current;
         if (canvas) {
-            imageContextRef.current = canvas.getContext('2d');
+            imageContextRef.current = canvas.getContext("2d");
         }
 
         const zoomCanvas = zoomCanvasRef.current;
         if (zoomCanvas) {
-            zoomContextRef.current = zoomCanvas.getContext('2d', {
+            zoomContextRef.current = zoomCanvas.getContext("2d", {
                 willReadFrequently: true,
             });
         }
@@ -71,15 +51,7 @@ const Canvas = ({
         const context = imageContextRef.current;
         const zoomContext = zoomContextRef.current;
 
-        if (
-            !canvas ||
-            !zoomCanvas ||
-            !context ||
-            !zoomContext ||
-            !image ||
-            pixelOffset === null
-        )
-            return;
+        if (!canvas || !zoomCanvas || !context || !zoomContext || !image || pixelOffset === null) return;
 
         const zoomLength = pixelOffset * 2 + 1;
         const zoomCenter = pixelOffset + 1;
@@ -90,7 +62,7 @@ const Canvas = ({
 
         let x: number, y: number;
 
-        if ('touches' in event) {
+        if ("touches" in event) {
             const touch = event.touches[0];
             x = (touch.clientX - rect.left) * scaleX;
             y = (touch.clientY - rect.top) * scaleY;
@@ -99,12 +71,7 @@ const Canvas = ({
             y = (event.clientY - rect.top) * scaleY;
         }
 
-        const imageData = zoomContext.getImageData(
-            zoomCenter,
-            zoomCenter,
-            1,
-            1,
-        ).data;
+        const imageData = zoomContext.getImageData(zoomCenter, zoomCenter, 1, 1).data;
         const [r, g, b] = imageData;
 
         setColor(rgbToHex(r, g, b));
@@ -124,7 +91,7 @@ const Canvas = ({
             0,
             0,
             zoomCanvas.width,
-            zoomCanvas.height,
+            zoomCanvas.height
         );
 
         zoomContext.restore();
@@ -143,13 +110,13 @@ const Canvas = ({
         setShowZoom(true);
     };
 
-    const handleCanvasClick = (event: CanvasEvent) => {
+    const handleCanvasClick = () => {
         if (colorDropperIsSelected && showZoom) {
             setSelectedColor(color);
         }
     };
 
-    const handleCanvasLeave = (event: CanvasEvent) => {
+    const handleCanvasLeave = () => {
         setShowZoom(false);
     };
 
@@ -172,54 +139,39 @@ const Canvas = ({
     return (
         <div
             ref={canvasBackRef}
-            className='canvas-back'
+            className="canvas-back"
             style={{
-                cursor: colorDropperIsSelected
-                    ? `url(${'ColorDropperCursor.svg'}) 5 5, auto`
-                    : 'default',
+                cursor: colorDropperIsSelected ? `url(${"ColorDropperCursor.svg"}) 5 5, auto` : "default",
             }}
         >
             <canvas
                 ref={imageCanvasRef}
-                className='image-canvas'
-                onMouseEnter={
-                    colorDropperIsSelected ? handleCanvasEnter : undefined
-                }
+                className="image-canvas"
+                onMouseEnter={colorDropperIsSelected ? handleCanvasEnter : undefined}
                 onMouseLeave={handleCanvasLeave}
-                onMouseMove={
-                    colorDropperIsSelected && showZoom
-                        ? handleCanvasMove
-                        : undefined
-                }
-                onTouchMove={
-                    colorDropperIsSelected && showZoom
-                        ? handleCanvasMove
-                        : undefined
-                }
+                onMouseMove={colorDropperIsSelected && showZoom ? handleCanvasMove : undefined}
+                onTouchMove={colorDropperIsSelected && showZoom ? handleCanvasMove : undefined}
                 onClick={handleCanvasClick}
             />
 
             {
                 <div
                     style={{
-                        opacity:
-                            showZoom && colorDropperIsSelected && imageFile
-                                ? '100%'
-                                : '0%',
-                        transition: '0.3s all',
+                        opacity: showZoom && colorDropperIsSelected && imageFile ? "100%" : "0%",
+                        transition: "0.3s all",
                     }}
                 >
                     <div
-                        className='zoom-canvas-back'
+                        className="zoom-canvas-back"
                         style={{
                             left: zoomCanvasPosition.left,
                             top: zoomCanvasPosition.top,
-                            border: `5px solid ${color || 'black'}`,
+                            border: `5px solid ${color || "black"}`,
                         }}
                     >
-                        <canvas className='zoom-canvas' ref={zoomCanvasRef} />
-                        <div className='color-text-back'>
-                            <p className='color-text'>{color}</p>
+                        <canvas className="zoom-canvas" ref={zoomCanvasRef} />
+                        <div className="color-text-back">
+                            <p className="color-text">{color}</p>
                         </div>
                     </div>
                 </div>
