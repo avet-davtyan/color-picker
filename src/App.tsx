@@ -1,15 +1,15 @@
 import Header from "./Header";
-import { useState } from "react";
 import Canvas from "./Canvas";
-import "./App.css";
 import Tools from "./Tools";
 import { useToolContext } from "./context/ToolContext";
+import "./App.css";
+
 function App() {
     const { selectedTool } = useToolContext();
-    const dropperIsSelected = () => selectedTool === Tools.ColorDropper && "picker";
+    const dropperIsSelected = selectedTool === Tools.ColorDropper;
 
     return (
-        <div className={`main-back ${dropperIsSelected()}`}>
+        <div className={`main-back ${dropperIsSelected && "picker"}`}>
             <div>
                 <Header />
                 <Canvas />

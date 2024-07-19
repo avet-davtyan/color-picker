@@ -10,6 +10,7 @@ const Header = ({}) => {
     const { selectedColor } = useColorContext();
     const { imageFile, setImageFile } = useImageContext();
     const { selectedTool, setSelectedTool } = useToolContext();
+    const dropperIsSelected = selectedTool === Tools.ColorDropper;
 
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>): void => {
         const files = event.target.files;
@@ -24,19 +25,15 @@ const Header = ({}) => {
 
     const handleColorDropperButtonClick = (): void => {
         if (!imageFile) return;
-
         setSelectedTool((prevState) => (prevState === Tools.ColorDropper ? Tools.None : Tools.ColorDropper));
     };
 
     return (
         <div className="header">
             <button
-                className="header-button"
+                className={`header-button ${dropperIsSelected && "selected"}`}
                 disabled={!imageFile}
                 onClick={handleColorDropperButtonClick}
-                style={{
-                    backgroundColor: selectedTool === Tools.ColorDropper ? "#a5a5a5" : undefined,
-                }}
             >
                 <img src={"IconColorPicker.svg"} alt="Color Picker" />
             </button>

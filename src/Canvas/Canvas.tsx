@@ -29,21 +29,7 @@ const Canvas: React.FC = () => {
         top: 0,
     });
 
-    const colorDropperIsSelected = selectedTool === Tools.ColorDropper;
-
-    useEffect(() => {
-        const canvas = imageCanvasRef.current;
-        if (canvas) {
-            imageContextRef.current = canvas.getContext("2d");
-        }
-
-        const zoomCanvas = zoomCanvasRef.current;
-        if (zoomCanvas) {
-            zoomContextRef.current = zoomCanvas.getContext("2d", {
-                willReadFrequently: true,
-            });
-        }
-    }, []);
+    const dropperIsSelected = selectedTool === Tools.ColorDropper;
 
     const handleCanvasMove = (event: CanvasEvent) => {
         const canvas = imageCanvasRef.current;
@@ -111,7 +97,7 @@ const Canvas: React.FC = () => {
     };
 
     const handleCanvasClick = () => {
-        if (colorDropperIsSelected && showZoom) {
+        if (dropperIsSelected && showZoom) {
             setSelectedColor(color);
         }
     };
@@ -136,46 +122,58 @@ const Canvas: React.FC = () => {
         }
     }, [imageFile]);
 
+    useEffect(() => {
+        const canvas = imageCanvasRef.current;
+        if (canvas) {
+            imageContextRef.current = canvas.getContext("2d");
+        }
+
+        const zoomCanvas = zoomCanvasRef.current;
+        if (zoomCanvas) {
+            zoomContextRef.current = zoomCanvas.getContext("2d", {
+                willReadFrequently: true,
+            });
+        }
+    }, []);
+
     return (
         <div
             ref={canvasBackRef}
             className="canvas-back"
             style={{
-                cursor: colorDropperIsSelected ? `url(${"ColorDropperCursor.svg"}) 5 5, auto` : "default",
+                cursor: dropperIsSelected ? `url(${"ColorDropperCursor.svg"}) 5 5, auto` : "default",
             }}
         >
             <canvas
                 ref={imageCanvasRef}
                 className="image-canvas"
-                onMouseEnter={colorDropperIsSelected ? handleCanvasEnter : undefined}
+                onMouseEnter={dropperIsSelected ? handleCanvasEnter : undefined}
                 onMouseLeave={handleCanvasLeave}
-                onMouseMove={colorDropperIsSelected && showZoom ? handleCanvasMove : undefined}
-                onTouchMove={colorDropperIsSelected && showZoom ? handleCanvasMove : undefined}
+                onMouseMove={dropperIsSelected && showZoom ? handleCanvasMove : undefined}
+                onTouchMove={dropperIsSelected && showZoom ? handleCanvasMove : undefined}
                 onClick={handleCanvasClick}
             />
 
-            {
+            <div
+                style={{
+                    opacity: showZoom && dropperIsSelected && imageFile ? "100%" : "0%",
+                    transition: "0.3s all",
+                }}
+            >
                 <div
+                    className="zoom-canvas-back"
                     style={{
-                        opacity: showZoom && colorDropperIsSelected && imageFile ? "100%" : "0%",
-                        transition: "0.3s all",
+                        left: zoomCanvasPosition.left,
+                        top: zoomCanvasPosition.top,
+                        border: `5px solid ${color || "black"}`,
                     }}
                 >
-                    <div
-                        className="zoom-canvas-back"
-                        style={{
-                            left: zoomCanvasPosition.left,
-                            top: zoomCanvasPosition.top,
-                            border: `5px solid ${color || "black"}`,
-                        }}
-                    >
-                        <canvas className="zoom-canvas" ref={zoomCanvasRef} />
-                        <div className="color-text-back">
-                            <p className="color-text">{color}</p>
-                        </div>
+                    <canvas className="zoom-canvas" ref={zoomCanvasRef} />
+                    <div className="color-text-back">
+                        <p className="color-text">{color}</p>
                     </div>
                 </div>
-            }
+            </div>
         </div>
     );
 };
