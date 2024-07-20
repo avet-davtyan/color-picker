@@ -1,11 +1,11 @@
-import { ChangeEvent, useRef } from "react";
-import "./Header.css";
-import Tools from "../Tools";
-import { useColorContext } from "../context/ColorContext";
-import { useImageContext } from "../context/ImageContext";
-import { useToolContext } from "../context/ToolContext";
+import { ChangeEvent, useRef } from 'react';
+import './Header.css';
+import Tools from '../Tools';
+import { useColorContext } from '../context/ColorContext';
+import { useImageContext } from '../context/ImageContext';
+import { useToolContext } from '../context/ToolContext';
 
-const Header = ({}) => {
+const Header: React.FC = () => {
     const inputRef = useRef<HTMLInputElement>(null);
     const { selectedColor } = useColorContext();
     const { imageFile, setImageFile } = useImageContext();
@@ -25,29 +25,34 @@ const Header = ({}) => {
 
     const handleColorDropperButtonClick = (): void => {
         if (!imageFile) return;
-        setSelectedTool((prevState) => (prevState === Tools.ColorDropper ? Tools.None : Tools.ColorDropper));
+        setSelectedTool(prevState =>
+            prevState === Tools.ColorDropper ? Tools.None : Tools.ColorDropper,
+        );
     };
 
     return (
-        <div className="header">
+        <div className='header'>
             <button
-                className={`header-button ${dropperIsSelected && "selected"}`}
+                className={`header-button ${dropperIsSelected && 'selected'}`}
                 disabled={!imageFile}
                 onClick={handleColorDropperButtonClick}
             >
-                <img src={"IconColorPicker.svg"} alt="Color Picker" />
+                <img src={'IconColorPicker.svg'} alt='Color Picker' />
             </button>
-            <p className="color">{selectedColor}</p>
+            <p className='color'>{selectedColor}</p>
             <div>
                 <input
                     ref={inputRef}
-                    type="file"
-                    accept="image/*"
+                    type='file'
+                    accept='image/*'
                     onChange={handleFileChange}
                     multiple={false}
-                    style={{ display: "none" }}
+                    style={{ display: 'none' }}
                 />
-                <button onClick={handleInputButtonClick} className="header-button">
+                <button
+                    onClick={handleInputButtonClick}
+                    className='header-button'
+                >
                     Choose an image
                 </button>
             </div>

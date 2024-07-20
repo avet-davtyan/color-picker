@@ -50,9 +50,7 @@ const useCanvasDraw = () => {
             img.onload = () => {
                 canvas.width = img.width;
                 canvas.height = img.height;
-                let offset = Math.round(
-                    Math.max(img.width, img.height) / zoomScale,
-                );
+                let offset = Math.round(Math.max(img.width, img.height) / zoomScale);
                 offset = Math.max(offset, 2);
 
                 if (img.width / img.height < 1.6) {
@@ -82,36 +80,7 @@ const useCanvasDraw = () => {
         reader.readAsDataURL(imageFile);
     };
 
-    const drawZoomCanvas = ({
-        x,
-        y,
-        zoomCanvasRef,
-        zoomContextRef,
-        image,
-        pixelOffset,
-    }: DrawZoomProps) => {
-        const zoomCanvas = zoomCanvasRef.current as HTMLCanvasElement;
-        const zoomContext = zoomContextRef.current as CanvasRenderingContext2D;
-
-        const zoomLength = pixelOffset * 2 + 1;
-        zoomContext.clearRect(0, 0, zoomCanvas.width, zoomCanvas.height);
-
-        zoomContext.drawImage(
-            image,
-            x - pixelOffset,
-            y - pixelOffset,
-            zoomLength,
-            zoomLength,
-            0,
-            0,
-            zoomCanvas.width,
-            zoomCanvas.height,
-        );
-
-        zoomContext.restore();
-    };
-
-    return { drawImageCanvas, drawZoomCanvas };
+    return { drawImageCanvas };
 };
 
 export default useCanvasDraw;

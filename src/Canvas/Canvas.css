@@ -44,3 +44,12 @@
     font-size: x-small;
     color: rgb(209, 209, 209);
 }
+
+.dropper {
+    cursor: url(/ColorDropperCursor.svg) 5 5, auto;
+}
+
+.transparent{
+    opacity: 0%;
+    transition: 0.3s all;
+}
