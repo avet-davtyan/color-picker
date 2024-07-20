@@ -1,26 +1,19 @@
-import { Dispatch, RefObject, SetStateAction } from 'react';
+import { Dispatch, RefObject, SetStateAction, useState } from 'react';
+import { useImageContext } from '../../context/ImageContext';
 
 interface DrawImageProps {
-    imageFile: Blob;
     imageCanvasRef: RefObject<HTMLCanvasElement>;
     zoomCanvasRef: RefObject<HTMLCanvasElement>;
     imageContextRef: RefObject<CanvasRenderingContext2D>;
     zoomContextRef: RefObject<CanvasRenderingContext2D>;
     canvasBackRef: RefObject<HTMLDivElement>;
-    setPixelOffset: Dispatch<SetStateAction<number | null>>;
-    setImage: Dispatch<SetStateAction<CanvasImageSource | null>>;
-}
-
-interface DrawZoomProps {
-    x: number;
-    y: number;
-    zoomCanvasRef: RefObject<HTMLCanvasElement>;
-    zoomContextRef: RefObject<CanvasRenderingContext2D>;
-    image: CanvasImageSource;
-    pixelOffset: number;
 }
 
 const useCanvasDraw = () => {
+    const [pixelOffset, setPixelOffset] = useState<number | null>(null);
+    const [image, setImage] = useState<CanvasImageSource | null>(null);
+    const { imageFile } = useImageContext();
+
     const zoomScale = 60;
     const canvasMaxWidthVW = 70;
     const viewportWidth = window.outerWidth;
@@ -28,15 +21,13 @@ const useCanvasDraw = () => {
     const canvasMaxHeight = (viewportHeight * canvasMaxWidthVW) / 100 + 'px';
     const canvasMaxWidth = (viewportWidth * canvasMaxWidthVW) / 100 + 'px';
     const drawImageCanvas = ({
-        imageFile,
         imageCanvasRef,
         zoomCanvasRef,
         imageContextRef,
         zoomContextRef,
         canvasBackRef,
-        setPixelOffset,
-        setImage,
     }: DrawImageProps) => {
+        if (!imageFile) return;
         const canvas = imageCanvasRef.current;
         const zoomCanvas = zoomCanvasRef.current;
         const context = imageContextRef.current;
@@ -80,7 +71,7 @@ const useCanvasDraw = () => {
         reader.readAsDataURL(imageFile);
     };
 
-    return { drawImageCanvas };
+    return { drawImageCanvas, pixelOffset, setPixelOffset, image, setImage };
 };
 
 export default useCanvasDraw;

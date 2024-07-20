@@ -53,3 +53,8 @@
     opacity: 0%;
     transition: 0.3s all;
 }
+
+.non-transparent {
+    opacity: 100%;
+    transition: 0.2s all;
+}

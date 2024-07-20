@@ -15,14 +15,13 @@ const Canvas: React.FC = () => {
     const { selectedTool } = useToolContext();
     const { setSelectedColor } = useColorContext();
 
-    const [pixelOffset, setPixelOffset] = useState<number | null>(null);
     const [color, setColor] = useState<string | null>(null);
-    const [image, setImage] = useState<CanvasImageSource | null>(null);
     const [showZoom, setShowZoom] = useState<boolean>(false);
 
-    const { imageCanvasRef, zoomCanvasRef, canvasBackRef, imageContextRef, zoomContextRef } = useCanvasRefs();
+    const canvasRefs = useCanvasRefs();
+    const { imageCanvasRef, zoomCanvasRef, canvasBackRef, imageContextRef, zoomContextRef } = canvasRefs;
 
-    const { drawImageCanvas } = useCanvasDraw();
+    const { drawImageCanvas, pixelOffset, image } = useCanvasDraw();
     const [zoomCanvasPosition, setZoomCanvasPosition] = useState<{
         left: number;
         top: number;
@@ -101,19 +100,10 @@ const Canvas: React.FC = () => {
     };
 
     useEffect(() => {
-        if (imageFile) {
-            setShowZoom(false);
-            drawImageCanvas({
-                imageFile,
-                imageCanvasRef,
-                zoomCanvasRef,
-                imageContextRef,
-                zoomContextRef,
-                canvasBackRef,
-                setPixelOffset,
-                setImage,
-            });
-        }
+        setShowZoom(false);
+        drawImageCanvas({
+            ...canvasRefs,
+        });
     }, [imageFile]);
 
     useEffect(() => {
@@ -141,7 +131,7 @@ const Canvas: React.FC = () => {
                 onTouchMove={dropperIsSelected && showZoom ? handleCanvasMove : undefined}
                 onClick={handleCanvasClick}
             />
-            <div className={!showZoom || !dropperIsSelected || !imageFile ? 'transparent' : undefined}>
+            <div className={!showZoom || !dropperIsSelected || !imageFile ? 'transparent' : 'non-transparent'}>
                 <div
                     className='zoom-canvas-back'
                     style={{
